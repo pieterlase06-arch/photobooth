@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photobooth Web</title>
+    <title>Web Photobooth</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="photobooth-container">
-        <h1>📸 My Photobooth</h1>
-        
-        <div class="camera-box">
+    <div class="app-container">
+        <div class="camera-section">
             <video id="camera-stream" autoplay playsinline></video>
+            <div id="countdown" class="hidden"></div>
+            
+            <button id="capture-btn">📸 Mulai Sesi (3 Foto)</button>
         </div>
-        
-        <button id="capture-btn">Ambil Foto</button>
 
-        <canvas id="photo-canvas" style="display: none;"></canvas>
-
-        <div class="result-box">
-            <img id="photo-result" alt="Hasil Foto Anda" style="display: none;" />
+        <div class="result-section">
+            <canvas id="strip-canvas" style="display: none;"></canvas>
+            
+            <img id="final-strip" alt="Photo Strip Template" style="display: none;">
+            <a id="download-btn" style="display: none;" download="photostrip-ku.png">⬇️ Download Template</a>
         </div>
     </div>
 
