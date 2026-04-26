@@ -3,26 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Photobooth</title>
+    <title>Premium Photobooth</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        <div class="camera-section">
-            <video id="camera-stream" autoplay playsinline></video>
-            <div id="countdown" class="hidden"></div>
-            
-            <button id="capture-btn">📸 Mulai Sesi (3 Foto)</button>
-        </div>
+    <div class="app-wrapper">
+        <header class="app-header">
+            <h1>📸 Ambon Snap Studio</h1>
+            <p>Abadikan momen terbaikmu hari ini!</p>
+        </header>
 
-        <div class="result-section">
-            <canvas id="strip-canvas" style="display: none;"></canvas>
-            
-            <img id="final-strip" alt="Photo Strip Template" style="display: none;">
-            <a id="download-btn" style="display: none;" download="photostrip-ku.png">⬇️ Download Template</a>
+        <div class="main-content">
+            <div class="camera-card">
+                <div class="video-container">
+                    <video id="camera-stream" autoplay playsinline></video>
+                    <div id="countdown" class="hidden"></div>
+                </div>
+                
+                <div class="controls">
+                    <div class="filters">
+                        <button class="filter-btn active" data-filter="none">Normal</button>
+                        <button class="filter-btn" data-filter="grayscale(100%)">B & W</button>
+                        <button class="filter-btn" data-filter="sepia(80%)">Vintage</button>
+                    </div>
+                    <button id="capture-btn">📸 Mulai Sesi (3 Foto)</button>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <canvas id="strip-canvas" style="display: none;"></canvas>
+                <img id="final-strip" alt="Photo Strip Template" style="display: none;">
+                <a id="download-btn" style="display: none;" download="photostrip.png">⬇️ Download Cetakan</a>
+            </div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
