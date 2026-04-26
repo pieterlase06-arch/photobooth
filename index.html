@@ -1,9 +1,28 @@
-<div class="photobooth-container">
-    <video id="camera-stream" autoplay playsinline></video>
-    <div id="countdown-display"></div>
-    <button id="capture-btn">Ambil Foto</button>
-    
-    <canvas id="photo-canvas" style="display: none;"></canvas>
-    
-    <img id="photo-result" alt="Hasil Tangkapan" />
-</div>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photobooth Web</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="photobooth-container">
+        <h1>📸 My Photobooth</h1>
+        
+        <div class="camera-box">
+            <video id="camera-stream" autoplay playsinline></video>
+        </div>
+        
+        <button id="capture-btn">Ambil Foto</button>
+
+        <canvas id="photo-canvas" style="display: none;"></canvas>
+
+        <div class="result-box">
+            <img id="photo-result" alt="Hasil Foto Anda" style="display: none;" />
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
