@@ -4,7 +4,213 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium Photobooth</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        .app-wrapper {
+            max-width: 1100px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .app-header {
+            text-align: center;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .app-header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: 1px;
+        }
+
+        .app-header p {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* Kotak Kamera dengan Efek Kaca (Glassmorphism) */
+        .camera-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.2);
+            width: 600px;
+            max-width: 100%;
+        }
+
+        .video-container {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            aspect-ratio: 4/3; /* Menjaga rasio kamera */
+        }
+
+        #camera-stream {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            transform: scaleX(-1);
+            transition: filter 0.3s; /* Animasi saat filter diganti */
+        }
+
+        #countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 140px;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 30px rgba(0,0,0,0.9);
+            margin: 0;
+            line-height: 1;
+        }
+
+        .hidden { display: none !important; }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Tombol Filter */
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: white;
+            color: #764ba2;
+            transform: scale(1.05);
+        }
+
+        /* Tombol Utama */
+        #capture-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+            font-family: inherit;
+        }
+
+        #capture-btn:hover {
+            transform: translateY(-2px);
+            background: #ff6b81;
+        }
+
+        #capture-btn:disabled {
+            background: #a4b0be;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Hasil Cetakan (Photo Strip) */
+        .result-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #final-strip {
+            background: white;
+            padding: 20px 20px 70px 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            width: 250px;
+            border-radius: 5px;
+        }
+
+        #download-btn {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            background: #2ed573;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(46, 213, 115, 0.4);
+        }
+
+        #download-btn:hover { 
+            background: #7bed9f; 
+            transform: translateY(-2px);
+        }
+
+        /* Pesan error kamera untuk iframe */
+        .camera-error-msg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #222;
+            color: #ff6b81;
+            text-align: center;
+            padding: 20px;
+            font-size: 1rem;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 10;
+        }
+    </style>
 </head>
 <body>
     <div class="app-wrapper">
@@ -14,8 +220,9 @@
         </header>
 
         <div class="main-content">
+            <!-- Sisi Kiri: Kamera & Tombol -->
             <div class="camera-card">
-                <div class="video-container">
+                <div class="video-container" id="video-container">
                     <video id="camera-stream" autoplay playsinline></video>
                     <div id="countdown" class="hidden"></div>
                 </div>
@@ -23,13 +230,15 @@
                 <div class="controls">
                     <div class="filters">
                         <button class="filter-btn active" data-filter="none">Normal</button>
-                        <button class="filter-btn" data-filter="grayscale(100%)">B & W</button>
+                        <button class="filter-btn" data-filter="grayscale(100%)">Hitam Putih</button>
                         <button class="filter-btn" data-filter="sepia(80%)">Vintage</button>
+                        <button class="filter-btn" data-filter="contrast(120%) saturate(120%)">Vivid</button>
                     </div>
                     <button id="capture-btn">📸 Mulai Sesi (3 Foto)</button>
                 </div>
             </div>
 
+            <!-- Sisi Kanan: Hasil Cetakan Photo Strip -->
             <div class="result-section">
                 <canvas id="strip-canvas" style="display: none;"></canvas>
                 <img id="final-strip" alt="Photo Strip Template" style="display: none;">
@@ -37,6 +246,123 @@
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        const video = document.getElementById('camera-stream');
+        const canvas = document.getElementById('strip-canvas');
+        const ctx = canvas.getContext('2d');
+        const finalStrip = document.getElementById('final-strip');
+        const captureBtn = document.getElementById('capture-btn');
+        const countdownEl = document.getElementById('countdown');
+        const downloadBtn = document.getElementById('download-btn');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+
+        let currentFilter = 'none';
+
+        // 1. Logika Penggantian Filter
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.getAttribute('data-filter');
+                video.style.filter = currentFilter;
+            });
+        });
+
+        // 2. Setup Kamera
+        async function setupCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+                video.srcObject = stream;
+            } catch (error) {
+                console.error("Kamera gagal diakses:", error);
+                // Pesan khusus jika kamera diblokir di mode preview
+                const container = document.getElementById('video-container');
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'camera-error-msg';
+                errorDiv.innerHTML = `
+                    <span>⚠️ Kamera tidak dapat diakses</span>
+                    <span style="font-size: 0.8rem; color: #ccc;">Di mode pratinjau ini browser memblokir kamera. Silakan copy kode ini ke VS Code / GitHub Anda agar berfungsi penuh.</span>
+                `;
+                container.appendChild(errorDiv);
+                captureBtn.disabled = true;
+                captureBtn.innerText = "Kamera Tidak Terdeteksi";
+            }
+        }
+        setupCamera();
+
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        // 3. Logika Memotret dan Merakit Photo Strip
+        captureBtn.addEventListener('click', async () => {
+            captureBtn.disabled = true;
+            captureBtn.innerText = "⏳ Sedang Memotret...";
+            
+            // Konfigurasi ukuran Kertas Cetakan
+            const photoWidth = 640;
+            const photoHeight = 480;
+            const gap = 20; 
+            const padding = 40; 
+            const bottomPadding = 150; // Ruang ekstra untuk teks di bawah
+
+            canvas.width = photoWidth + (padding * 2);
+            canvas.height = (photoHeight * 3) + (gap * 2) + padding + bottomPadding;
+
+            // Warnai kertas menjadi putih bersih
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Ambil 3 foto
+            for (let i = 0; i < 3; i++) {
+                countdownEl.classList.remove('hidden');
+                for (let count = 3; count > 0; count--) {
+                    countdownEl.innerText = count;
+                    await sleep(1000);
+                }
+                countdownEl.innerText = "📸";
+                await sleep(400); // Waktu kilat saat dijepret
+                countdownEl.classList.add('hidden');
+
+                const yPos = padding + (i * (photoHeight + gap));
+
+                // Gambar ke canvas
+                ctx.save();
+                ctx.translate(canvas.width, 0);
+                ctx.scale(-1, 1); // Balik gambar (efek cermin)
+                
+                // Terapkan filter warna ke canvas (sama persis dengan yang di layar)
+                ctx.filter = currentFilter;
+                
+                ctx.drawImage(video, padding, yPos, photoWidth, photoHeight);
+                ctx.restore();
+                
+                await sleep(700); // Jeda bernapas sebelum foto berikutnya
+            }
+
+            // Tulis Teks Logo di bagian bawah kertas
+            ctx.fillStyle = "black";
+            ctx.font = "bold 50px 'Poppins', sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("Snap Studio", canvas.width / 2, canvas.height - 70);
+            
+            // Tulis Tanggal hari ini
+            ctx.font = "normal 30px 'Poppins', sans-serif";
+            ctx.fillStyle = "#888";
+            const date = new Date().toLocaleDateString('id-ID');
+            ctx.fillText(date, canvas.width / 2, canvas.height - 30);
+
+            // Tampilkan Hasilnya ke Layar
+            const dataURL = canvas.toDataURL('image/png');
+            finalStrip.src = dataURL;
+            finalStrip.style.display = "block";
+            
+            downloadBtn.href = dataURL;
+            downloadBtn.style.display = "block";
+
+            // Kembalikan tombol seperti semula
+            captureBtn.innerText = "📸 Mulai Sesi (3 Foto)";
+            captureBtn.disabled = false;
+        });
+    </script>
 </body>
 </html>
