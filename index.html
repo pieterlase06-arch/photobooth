@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Photobooth</title>
+    <title>Photobooth Web</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2b5876 0%, #4e4376 100%);
             color: white;
             min-height: 100vh;
             margin: 0;
@@ -21,17 +21,18 @@
         }
 
         .app-wrapper {
-            max-width: 1100px;
+            max-width: 1200px;
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 30px;
+            gap: 20px;
         }
 
         .app-header {
             text-align: center;
             text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
         }
 
         .app-header h1 {
@@ -40,27 +41,22 @@
             letter-spacing: 1px;
         }
 
-        .app-header p {
-            margin: 5px 0 0 0;
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-
         .main-content {
             display: flex;
             flex-wrap: wrap;
             gap: 40px;
             justify-content: center;
             align-items: flex-start;
+            width: 100%;
         }
 
-        /* Kotak Kamera dengan Efek Kaca (Glassmorphism) */
+        /* Kotak Kamera & Pengaturan */
         .camera-card {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 20px;
+            backdrop-filter: blur(15px);
+            padding: 25px;
             border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.2);
             width: 600px;
             max-width: 100%;
@@ -72,7 +68,7 @@
             overflow: hidden;
             background: #000;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            aspect-ratio: 4/3; /* Menjaga rasio kamera */
+            aspect-ratio: 4/3;
         }
 
         #camera-stream {
@@ -81,7 +77,7 @@
             display: block;
             object-fit: cover;
             transform: scaleX(-1);
-            transition: filter 0.3s; /* Animasi saat filter diganti */
+            transition: filter 0.3s;
         }
 
         #countdown {
@@ -89,10 +85,10 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 140px;
+            font-size: 150px;
             font-weight: 800;
             color: #fff;
-            text-shadow: 0 0 30px rgba(0,0,0,0.9);
+            text-shadow: 0 0 40px rgba(0,0,0,0.8);
             margin: 0;
             line-height: 1;
         }
@@ -100,10 +96,49 @@
         .hidden { display: none !important; }
 
         .controls {
-            margin-top: 20px;
+            margin-top: 25px;
             display: flex;
             flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Grup Pengaturan (Layout & Frame) */
+        .settings-group {
+            display: flex;
             gap: 15px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .setting-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 150px;
+        }
+
+        .setting-item label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .setting-item select {
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.4);
+            background: rgba(0,0,0,0.3);
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .setting-item select option {
+            background: #2b5876;
+            color: white;
         }
 
         /* Tombol Filter */
@@ -115,8 +150,8 @@
         }
 
         .filter-btn {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
             color: white;
             padding: 8px 16px;
             border-radius: 20px;
@@ -129,8 +164,9 @@
 
         .filter-btn.active, .filter-btn:hover {
             background: white;
-            color: #764ba2;
+            color: #2b5876;
             transform: scale(1.05);
+            border-color: white;
         }
 
         /* Tombol Utama */
@@ -138,19 +174,22 @@
             background: #ff4757;
             color: white;
             border: none;
-            padding: 15px;
+            padding: 18px;
             font-size: 1.2rem;
             font-weight: 600;
             border-radius: 12px;
             cursor: pointer;
             transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+            box-shadow: 0 8px 20px rgba(255, 71, 87, 0.4);
             font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         #capture-btn:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
             background: #ff6b81;
+            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.6);
         }
 
         #capture-btn:disabled {
@@ -160,19 +199,23 @@
             box-shadow: none;
         }
 
-        /* Hasil Cetakan (Photo Strip) */
+        /* Hasil Cetakan */
         .result-section {
             display: flex;
             flex-direction: column;
             align-items: center;
+            flex: 1;
+            min-width: 300px;
         }
 
         #final-strip {
-            background: white;
-            padding: 20px 20px 70px 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-            width: 250px;
-            border-radius: 5px;
+            background: white; /* Fallback */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            max-width: 100%;
+            height: auto;
+            max-height: 80vh; /* Agar tidak terlalu panjang ke bawah di layar */
+            border-radius: 8px;
+            object-fit: contain;
         }
 
         #download-btn {
@@ -181,20 +224,20 @@
             text-align: center;
             background: #2ed573;
             color: white;
-            padding: 12px 24px;
+            padding: 15px 30px;
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-weight: 600;
+            font-size: 1.1rem;
             transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(46, 213, 115, 0.4);
+            box-shadow: 0 8px 20px rgba(46, 213, 115, 0.4);
         }
 
         #download-btn:hover { 
             background: #7bed9f; 
-            transform: translateY(-2px);
+            transform: translateY(-3px);
         }
 
-        /* Pesan error kamera untuk iframe */
         .camera-error-msg {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -215,12 +258,11 @@
 <body>
     <div class="app-wrapper">
         <header class="app-header">
-            <h1>📸 Ambon Snap Studio</h1>
-            <p>Abadikan momen terbaikmu hari ini!</p>
+            <h1>📸 Photobooth Studio</h1>
         </header>
 
         <div class="main-content">
-            <!-- Sisi Kiri: Kamera & Tombol -->
+            <!-- Sisi Kiri: Kamera & Pengaturan -->
             <div class="camera-card">
                 <div class="video-container" id="video-container">
                     <video id="camera-stream" autoplay playsinline></video>
@@ -228,21 +270,46 @@
                 </div>
                 
                 <div class="controls">
+                    <!-- Opsi Filter -->
                     <div class="filters">
                         <button class="filter-btn active" data-filter="none">Normal</button>
                         <button class="filter-btn" data-filter="grayscale(100%)">Hitam Putih</button>
                         <button class="filter-btn" data-filter="sepia(80%)">Vintage</button>
                         <button class="filter-btn" data-filter="contrast(120%) saturate(120%)">Vivid</button>
                     </div>
+
+                    <!-- Opsi Layout & Bingkai -->
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <label for="layout-select">🖼️ Layout Cetakan:</label>
+                            <select id="layout-select">
+                                <option value="1x3">Strip Panjang (1x3 Foto)</option>
+                                <option value="2x2">Grid Persegi (2x2 Foto)</option>
+                                <option value="2x3">Grid Besar (2x3 Foto)</option>
+                                <option value="3x3">Grid Kolase (3x3 Foto)</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label for="frame-color">🎨 Warna Bingkai:</label>
+                            <select id="frame-color">
+                                <option value="#ffffff">Putih Bersih</option>
+                                <option value="#111111">Hitam Elegan</option>
+                                <option value="#ffeaa7">Kuning Pastel</option>
+                                <option value="#ffcccc">Pink Pastel</option>
+                                <option value="#c7ecee">Biru Muda</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <button id="capture-btn">📸 Mulai Sesi (3 Foto)</button>
                 </div>
             </div>
 
-            <!-- Sisi Kanan: Hasil Cetakan Photo Strip -->
+            <!-- Sisi Kanan: Hasil Cetakan -->
             <div class="result-section">
                 <canvas id="strip-canvas" style="display: none;"></canvas>
-                <img id="final-strip" alt="Photo Strip Template" style="display: none;">
-                <a id="download-btn" style="display: none;" download="photostrip.png">⬇️ Download Cetakan</a>
+                <img id="final-strip" alt="Hasil Photobooth" style="display: none;">
+                <a id="download-btn" style="display: none;" download="photobooth.png">⬇️ Download Foto</a>
             </div>
         </div>
     </div>
@@ -256,10 +323,27 @@
         const countdownEl = document.getElementById('countdown');
         const downloadBtn = document.getElementById('download-btn');
         const filterBtns = document.querySelectorAll('.filter-btn');
+        const layoutSelect = document.getElementById('layout-select');
+        const frameColorSelect = document.getElementById('frame-color');
 
         let currentFilter = 'none';
 
-        // 1. Logika Penggantian Filter
+        // Konfigurasi Jenis Layout
+        const layoutConfigs = {
+            '1x3': { cols: 1, rows: 3 },
+            '2x2': { cols: 2, rows: 2 },
+            '2x3': { cols: 2, rows: 3 },
+            '3x3': { cols: 3, rows: 3 }
+        };
+
+        // Update Tombol Mulai Sesi saat layout diganti
+        layoutSelect.addEventListener('change', () => {
+            const config = layoutConfigs[layoutSelect.value];
+            const total = config.cols * config.rows;
+            captureBtn.innerText = `📸 Mulai Sesi (${total} Foto)`;
+        });
+
+        // Logika Penggantian Filter Warna Layar
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 filterBtns.forEach(b => b.classList.remove('active'));
@@ -269,89 +353,103 @@
             });
         });
 
-        // 2. Setup Kamera
+        // Setup Kamera
         async function setupCamera() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+                // Meminta resolusi lebih tinggi agar cetakan grid tidak pecah
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 960 } });
                 video.srcObject = stream;
             } catch (error) {
                 console.error("Kamera gagal diakses:", error);
-                // Pesan khusus jika kamera diblokir di mode preview
                 const container = document.getElementById('video-container');
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'camera-error-msg';
                 errorDiv.innerHTML = `
                     <span>⚠️ Kamera tidak dapat diakses</span>
-                    <span style="font-size: 0.8rem; color: #ccc;">Di mode pratinjau ini browser memblokir kamera. Silakan copy kode ini ke VS Code / GitHub Anda agar berfungsi penuh.</span>
+                    <span style="font-size: 0.8rem; color: #ccc;">Pastikan Anda memberi izin akses kamera atau salin kode ini ke local Anda.</span>
                 `;
                 container.appendChild(errorDiv);
                 captureBtn.disabled = true;
-                captureBtn.innerText = "Kamera Tidak Terdeteksi";
+                captureBtn.innerText = "Kamera Terblokir";
             }
         }
         setupCamera();
 
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-        // 3. Logika Memotret dan Merakit Photo Strip
+        // Logika Utama Memotret & Menyusun Layout (Grid)
         captureBtn.addEventListener('click', async () => {
+            // Ambil konfigurasi layout saat ini
+            const layoutType = layoutSelect.value;
+            const { cols, rows } = layoutConfigs[layoutType];
+            const totalPhotos = cols * rows;
+
             captureBtn.disabled = true;
-            captureBtn.innerText = "⏳ Sedang Memotret...";
+            captureBtn.innerText = `⏳ Memotret (0/${totalPhotos})...`;
             
-            // Konfigurasi ukuran Kertas Cetakan
-            const photoWidth = 640;
-            const photoHeight = 480;
-            const gap = 20; 
-            const padding = 40; 
-            const bottomPadding = 150; // Ruang ekstra untuk teks di bawah
+            // Konfigurasi Ukuran & Jarak Kertas Cetakan
+            const photoWidth = 800; // Ukuran resolusi dalam canvas lebih besar agar HD
+            const photoHeight = 600;
+            const gap = 30; // Jarak antar foto
+            const padding = 50; // Bingkai luar
+            const bottomPadding = 120; // Ruang untuk tanggal di bawah
 
-            canvas.width = photoWidth + (padding * 2);
-            canvas.height = (photoHeight * 3) + (gap * 2) + padding + bottomPadding;
+            // Kalkulasi Ukuran Canvas Dinamis berdasarkan Kolom & Baris
+            canvas.width = (padding * 2) + (photoWidth * cols) + (gap * (cols - 1));
+            canvas.height = padding + (photoHeight * rows) + (gap * (rows - 1)) + bottomPadding;
 
-            // Warnai kertas menjadi putih bersih
-            ctx.fillStyle = "white";
+            // Warnai background sesuai pilihan
+            const frameColor = frameColorSelect.value;
+            ctx.fillStyle = frameColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Ambil 3 foto
-            for (let i = 0; i < 3; i++) {
+            // Loop untuk mengambil foto sebanyak 'totalPhotos'
+            for (let i = 0; i < totalPhotos; i++) {
+                captureBtn.innerText = `⏳ Memotret (${i+1}/${totalPhotos})...`;
+                
+                // Hitung Mundur
                 countdownEl.classList.remove('hidden');
                 for (let count = 3; count > 0; count--) {
                     countdownEl.innerText = count;
                     await sleep(1000);
                 }
                 countdownEl.innerText = "📸";
-                await sleep(400); // Waktu kilat saat dijepret
+                await sleep(400); // Waktu kilat flash
                 countdownEl.classList.add('hidden');
 
-                const yPos = padding + (i * (photoHeight + gap));
+                // Kalkulasi Koordinat X & Y untuk sistem Grid
+                const colIndex = i % cols;
+                const rowIndex = Math.floor(i / cols);
+                
+                const visualX = padding + colIndex * (photoWidth + gap);
+                const yPos = padding + rowIndex * (photoHeight + gap);
 
-                // Gambar ke canvas
+                // Gambar ke canvas dengan efek cermin dan posisi yang benar
                 ctx.save();
                 ctx.translate(canvas.width, 0);
-                ctx.scale(-1, 1); // Balik gambar (efek cermin)
+                ctx.scale(-1, 1); 
                 
-                // Terapkan filter warna ke canvas (sama persis dengan yang di layar)
-                ctx.filter = currentFilter;
+                // Rumus matematika agar posisi X tidak terbalik di canvas yang di-mirror
+                const flippedX = canvas.width - visualX - photoWidth;
                 
-                ctx.drawImage(video, padding, yPos, photoWidth, photoHeight);
+                ctx.filter = currentFilter; // Terapkan efek Hitam Putih/Vintage
+                ctx.drawImage(video, flippedX, yPos, photoWidth, photoHeight);
                 ctx.restore();
                 
-                await sleep(700); // Jeda bernapas sebelum foto berikutnya
+                await sleep(800); // Jeda sebelum jepretan selanjutnya
             }
 
-            // Tulis Teks Logo di bagian bawah kertas
-            ctx.fillStyle = "black";
-            ctx.font = "bold 50px 'Poppins', sans-serif";
+            // Tulis Tanggal di bagian tengah bawah
+            // Pilih warna teks agar kontras dengan warna bingkai
+            ctx.fillStyle = (frameColor === '#111111') ? '#dddddd' : '#555555';
+            ctx.font = "bold 35px 'Poppins', sans-serif";
             ctx.textAlign = "center";
-            ctx.fillText("Snap Studio", canvas.width / 2, canvas.height - 70);
             
-            // Tulis Tanggal hari ini
-            ctx.font = "normal 30px 'Poppins', sans-serif";
-            ctx.fillStyle = "#888";
-            const date = new Date().toLocaleDateString('id-ID');
-            ctx.fillText(date, canvas.width / 2, canvas.height - 30);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateStr = new Date().toLocaleDateString('id-ID', options);
+            ctx.fillText(dateStr, canvas.width / 2, canvas.height - 45);
 
-            // Tampilkan Hasilnya ke Layar
+            // Tampilkan Hasil Akhirnya
             const dataURL = canvas.toDataURL('image/png');
             finalStrip.src = dataURL;
             finalStrip.style.display = "block";
@@ -359,8 +457,8 @@
             downloadBtn.href = dataURL;
             downloadBtn.style.display = "block";
 
-            // Kembalikan tombol seperti semula
-            captureBtn.innerText = "📸 Mulai Sesi (3 Foto)";
+            // Kembalikan UI Tombol
+            captureBtn.innerText = `📸 Mulai Sesi (${totalPhotos} Foto)`;
             captureBtn.disabled = false;
         });
     </script>
