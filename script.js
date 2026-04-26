@@ -5,75 +5,105 @@ const finalStrip = document.getElementById('final-strip');
 const captureBtn = document.getElementById('capture-btn');
 const countdownEl = document.getElementById('countdown');
 const downloadBtn = document.getElementById('download-btn');
+const filterBtns = document.querySelectorAll('.filter-btn');
 
-// Nyalakan Kamera
+let currentFilter = 'none';
+
+// 1. Logika Penggantian Filter
+filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Hapus status aktif dari semua tombol
+        filterBtns.forEach(b => b.classList.remove('active'));
+        // Jadikan tombol yang diklik menjadi aktif
+        btn.classList.add('active');
+        
+        // Aplikasikan filter CSS ke video kamera
+        currentFilter = btn.getAttribute('data-filter');
+        video.style.filter = currentFilter;
+    });
+});
+
+// 2. Setup Kamera
 async function setupCamera() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
         video.srcObject = stream;
     } catch (error) {
-        console.error("Gagal akses kamera", error);
+        console.error("Kamera gagal diakses:", error);
+        alert("Tolong izinkan akses kamera!");
     }
 }
 setupCamera();
 
-// Fungsi Jeda Waktu (Delay)
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+// 3. Logika Memotret dan Merakit Photo Strip
 captureBtn.addEventListener('click', async () => {
     captureBtn.disabled = true;
+    captureBtn.innerText = "⏳ Sedang Memotret...";
     
-    // Setting Ukuran Template (Lebar 640px, Tinggi disesuaikan untuk 3 foto + jarak)
+    // Konfigurasi ukuran Kertas Cetakan
     const photoWidth = 640;
     const photoHeight = 480;
-    const gap = 20; // Jarak antar foto
-    const padding = 40; // Frame luar putih
-    const bottomPadding = 120; // Ruang putih di bawah untuk teks/logo
+    const gap = 20; 
+    const padding = 40; 
+    const bottomPadding = 150; // Ruang ekstra untuk teks di bawah
 
     canvas.width = photoWidth + (padding * 2);
     canvas.height = (photoHeight * 3) + (gap * 2) + padding + bottomPadding;
 
-    // Warnai background template jadi putih
+    // Warnai kertas menjadi putih bersih
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Looping ambil 3 foto
+    // Ambil 3 foto
     for (let i = 0; i < 3; i++) {
-        // Hitung Mundur 3, 2, 1
         countdownEl.classList.remove('hidden');
         for (let count = 3; count > 0; count--) {
             countdownEl.innerText = count;
             await sleep(1000);
         }
-        countdownEl.innerText = "📸 Cekrek!";
-        await sleep(500);
+        countdownEl.innerText = "📸";
+        await sleep(400); // Waktu kilat saat dijepret
         countdownEl.classList.add('hidden');
 
-        // Kalkulasi posisi Y untuk menempelkan foto ke-1, 2, 3 ke bawah
         const yPos = padding + (i * (photoHeight + gap));
 
-        // Gambar ke canvas (Dibalik agar tidak mirror)
+        // Gambar ke canvas
         ctx.save();
         ctx.translate(canvas.width, 0);
-        ctx.scale(-1, 1);
+        ctx.scale(-1, 1); // Balik gambar (efek cermin)
+        
+        // Terapkan filter warna ke canvas (sama persis dengan yang di layar)
+        ctx.filter = currentFilter;
+        
         ctx.drawImage(video, padding, yPos, photoWidth, photoHeight);
         ctx.restore();
+        
+        await sleep(700); // Jeda bernapas sebelum foto berikutnya
     }
 
-    // Tulis teks / tanggal di bagian bawah template
+    // Tulis Teks Logo di bagian bawah kertas
     ctx.fillStyle = "black";
-    ctx.font = "bold 40px 'Segoe UI'";
+    ctx.font = "bold 50px 'Poppins', sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("My Photobooth", canvas.width / 2, canvas.height - 40);
+    ctx.fillText("Snap Studio", canvas.width / 2, canvas.height - 70);
+    
+    // Tulis Tanggal hari ini
+    ctx.font = "normal 30px 'Poppins', sans-serif";
+    ctx.fillStyle = "#888";
+    const date = new Date().toLocaleDateString('id-ID');
+    ctx.fillText(date, canvas.width / 2, canvas.height - 30);
 
-    // Tampilkan Hasil Template
+    // Tampilkan Hasilnya ke Layar
     const dataURL = canvas.toDataURL('image/png');
     finalStrip.src = dataURL;
     finalStrip.style.display = "block";
     
-    // Siapkan tombol download
     downloadBtn.href = dataURL;
-    downloadBtn.style.display = "inline-block";
+    downloadBtn.style.display = "block";
 
+    // Kembalikan tombol seperti semula
+    captureBtn.innerText = "📸 Mulai Sesi (3 Foto)";
     captureBtn.disabled = false;
 });
